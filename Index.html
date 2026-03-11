@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCM Exam Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --m1: #c8f04a;
+    --m2: #4af0c8;
+    --text: #e8e8e8;
+    --muted: #666;
+    --correct: #4af0c8;
+    --wrong: #f04a6a;
+    --pending: #c8f04a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* LANDING */
+  #landing {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #landing::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,240,74,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  #landing::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; right: -150px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,240,200,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .landing-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .landing-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.0;
+    margin-bottom: 16px;
+  }
+
+  .landing-title span {
+    display: block;
+    color: var(--m1);
+  }
+
+  .landing-sub {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 60px;
+    letter-spacing: 1px;
+  }
+
+  .module-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .module-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 32px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .module-card.m1::before { background: var(--m1); }
+  .module-card.m2::before { background: var(--m2); }
+
+  .module-card:hover {
+    border-color: var(--border);
+    transform: translateY(-4px);
+    background: var(--surface2);
+  }
+
+  .card-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 12px;
+    opacity: 0.15;
+    position: absolute;
+    top: 16px; right: 20px;
+  }
+
+  .card-tag {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .m1 .card-tag { color: var(--m1); }
+  .m2 .card-tag { color: var(--m2); }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .card-meta {
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .card-meta strong {
+    color: var(--text);
+  }
+
+  .start-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    background: none;
+    border: 1px solid;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+
+  .m1 .start-btn { color: var(--m1); border-color: var(--m1); }
+  .m2 .start-btn { color: var(--m2); border-color: var(--m2); }
+  .m1 .start-btn:hover { background: var(--m1); color: var(--bg); }
+  .m2 .start-btn:hover { background: var(--m2); color: var(--bg); }
+
+  /* QUIZ VIEW */
+  #quiz-view {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .quiz-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .quiz-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+
+  .back-btn:hover { color: var(--text); border-color: var(--text); }
+
+  .quiz-module-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .m1-label { color: var(--m1); }
+  .m2-label { color: var(--m2); }
+
+  .quiz-progress-text {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .quiz-progress-text strong { color: var(--text); }
+
+  .progress-bar-wrap {
+    flex: 1;
+    max-width: 300px;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .m1-fill { background: var(--m1); }
+  .m2-fill { background: var(--m2); }
+
+  .score-display {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .score-display strong { color: var(--correct); }
+
+  /* QUESTION AREA */
+  .quiz-body {
+    flex: 1;
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .q-number {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .q-text {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(17px, 2.5vw, 21px);
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 36px;
+    color: var(--text);
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  .option:hover:not(.disabled) {
+    border-color: var(--muted);
+    background: var(--surface2);
+  }
+
+  .option.selected-correct {
+    border-color: var(--correct);
+    background: rgba(74,240,200,0.06);
+    color: var(--correct);
+  }
+
+  .option.selected-wrong {
+    border-color: var(--wrong);
+    background: rgba(240,74,106,0.06);
+    color: var(--wrong);
+  }
+
+  .option.show-correct {
+    border-color: var(--correct);
+    background: rgba(74,240,200,0.04);
+    color: var(--correct);
+    opacity: 0.7;
+  }
+
+  .option.disabled { cursor: default; }
+
+  .opt-letter {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.7;
+    margin-top: 1px;
+  }
+
+  .feedback {
+    padding: 16px 20px;
+    border-radius: 2px;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    display: none;
+  }
+
+  .feedback.correct-fb {
+    background: rgba(74,240,200,0.08);
+    border-left: 3px solid var(--correct);
+    color: var(--correct);
+    display: block;
+  }
+
+  .feedback.wrong-fb {
+    background: rgba(240,74,106,0.08);
+    border-left: 3px solid var(--wrong);
+    color: var(--wrong);
+    display: block;
+  }
+
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border: 1px solid;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+
+  .nav-btn.primary-m1 { color: var(--m1); border-color: var(--m1); }
+  .nav-btn.primary-m1:hover { background: var(--m1); color: var(--bg); }
+  .nav-btn.primary-m2 { color: var(--m2); border-color: var(--m2); }
+  .nav-btn.primary-m2:hover { background: var(--m2); color: var(--bg); }
+  .nav-btn.secondary { color: var(--muted); border-color: var(--border); }
+  .nav-btn.secondary:hover { color: var(--text); border-color: var(--muted); }
+
+  /* RESULTS */
+  #results-view {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+
+  .results-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .results-score {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(80px, 15vw, 140px);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .results-total {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+
+  .results-breakdown {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .rb-item {
+    text-align: center;
+  }
+
+  .rb-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  .rb-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .results-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .review-list {
+    max-width: 760px;
+    width: 100%;
+    margin-top: 48px;
+  }
+
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
+  .review-item.r-correct { border-left: 3px solid var(--correct); }
+  .review-item.r-wrong { border-left: 3px solid var(--wrong); }
+
+  .review-q { font-family: 'Syne', sans-serif; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .review-your { color: var(--wrong); font-size: 12px; margin-bottom: 4px; }
+  .review-correct-ans { color: var(--correct); font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .quiz-header { padding: 12px 16px; flex-wrap: wrap; }
+    .quiz-body { padding: 32px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="landing-label"></div>
+  <h1 class="landing-title"><span>SCM</span></h1>
+  <p class="landing-sub">exam practice · 80 questions · two modules</p>
+
+  <div class="module-cards">
+    <div class="module-card m1" onclick="startQuiz(1)">
+      <div class="card-num">01</div>
+      <div class="card-tag">Module 1</div>
+      <div class="card-title">SC Performance, Production Planning & Procurement</div>
+      <div class="card-desc">SCOR Model · Fisher Matrix · Production Plans · Lean Management · Kraljic Matrix · Supplier Selection · GVR</div>
+      <div class="card-meta">
+        <span><strong>40</strong> questions</span>
+        <span>Multiple choice</span>
+      </div>
+      <button class="start-btn">Start →</button>
+    </div>
+
+    <div class="module-card m2" onclick="startQuiz(2)">
+      <div class="card-num">02</div>
+      <div class="card-tag">Module 2</div>
+      <div class="card-title">SC Strategy, Inventory, Network Design & Coordination</div>
+      <div class="card-desc">ODP · EOQ · Safety Stock · Aggregate Planning · Forecasting · Network Design · VRP · Bullwhip Effect</div>
+      <div class="card-meta">
+        <span><strong>40</strong> questions</span>
+        <span>Multiple choice</span>
+      </div>
+      <button class="start-btn">Start →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ VIEW -->
+<div id="quiz-view">
+  <div class="quiz-header">
+    <div class="quiz-header-left">
+      <button class="back-btn" onclick="goHome()">← Back</button>
+      <span class="quiz-module-label" id="module-label"></span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="quiz-progress-text"><strong id="q-current">1</strong> / <span id="q-total">40</span></div>
+    <div class="score-display">Score: <strong id="score-live">0</strong></div>
+  </div>
+
+  <div class="quiz-body">
+    <div class="q-number" id="q-num-label"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="options" id="options-container"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="nav-btns">
+      <button class="nav-btn" id="next-btn" onclick="nextQuestion()" style="display:none"></button>
+      <button class="nav-btn secondary" onclick="skipQuestion()" id="skip-btn">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS VIEW -->
+<div id="results-view">
+  <div class="results-label" id="results-module-label"></div>
+  <div class="results-score" id="results-score-big"></div>
+  <div class="results-total" id="results-total-text"></div>
+  <div class="results-breakdown">
+    <div class="rb-item">
+      <div class="rb-val" style="color:var(--correct)" id="rb-correct">0</div>
+      <div class="rb-label">Correct</div>
+    </div>
+    <div class="rb-item">
+      <div class="rb-val" style="color:var(--wrong)" id="rb-wrong">0</div>
+      <div class="rb-label">Wrong</div>
+    </div>
+    <div class="rb-item">
+      <div class="rb-val" style="color:var(--muted)" id="rb-skipped">0</div>
+      <div class="rb-label">Skipped</div>
+    </div>
+  </div>
+  <div class="results-actions">
+    <button class="nav-btn" id="retry-btn" onclick="retryQuiz()"></button>
+    <button class="nav-btn secondary" onclick="goHome()">← All Modules</button>
+  </div>
+  <div class="review-list" id="review-list"></div>
+</div>
+
+<script>
+const QUESTIONS = {
+  1: [
+    {
+      q: "Which of the following best describes a Supply Chain?",
+      opts: ["A single company that manufactures and delivers products to customers","All parties involved, directly or indirectly, in fulfilling a customer request","The internal logistics department of a manufacturing company","A network of warehouses used to store finished goods"],
+      ans: 1
+    },
+    {
+      q: "In the SCOR Model (traditional version), which process is responsible for transforming raw materials into finished products?",
+      opts: ["Source","Deliver","Make","Plan"],
+      ans: 2
+    },
+    {
+      q: "According to Fisher's framework, functional products are characterized by:",
+      opts: ["High innovation rates and short product life cycles","Unpredictable demand and high stockout costs","Stable demand patterns and easy sales forecasting","The need for a reactive supply chain with buffer inventory"],
+      ans: 2
+    },
+    {
+      q: "Which of the following is a characteristic of an Efficient Supply Chain?",
+      opts: ["Excess production capacity to respond quickly to market changes","High inventory levels to buffer against demand uncertainty","Supplier selection based on cost and quality","Lead time reduction even at the expense of higher costs"],
+      ans: 2
+    },
+    {
+      q: "In the SCOR Digital Standard (2026), which process acts as the 'brain' of the operation, covering strategy, data analytics, and technology?",
+      opts: ["Plan","Transform","Fulfill","Orchestrate"],
+      ans: 3
+    },
+    {
+      q: "Which of the following departments is considered INDIRECTLY involved in SCM processes?",
+      opts: ["Procurement","Logistics","Finance","Production"],
+      ans: 2
+    },
+    {
+      q: "A company selling fast-moving consumer goods (FMCG) with predictable demand adopts a reactive supply chain. According to Fisher's matrix, this represents:",
+      opts: ["A match between product type and supply chain strategy","A mismatch between product type and supply chain strategy","The optimal strategy for any type of product","A strategy that minimizes total logistics costs"],
+      ans: 1
+    },
+    {
+      q: "Total Logistics Cost includes which of the following components?",
+      opts: ["Transportation, holding, warehouse, and administrative costs","Production, marketing, R&D, and transportation costs","Holding, production, procurement, and sales costs","Warehouse, distribution, marketing, and administrative costs"],
+      ans: 0
+    },
+    {
+      q: "Which of the following correctly describes the evolution of Supply Chain Management from the 1960s to today?",
+      opts: ["Fragmentation → Consolidation → Integration → Value Capture → Automation","Integration → Consolidation → Fragmentation → Automation → Value Capture","Consolidation → Integration → Fragmentation → Value Capture → Automation","Automation → Value Capture → Integration → Consolidation → Fragmentation"],
+      ans: 0
+    },
+    {
+      q: "In the context of the Fisher Matrix applied globally, which type of nation is most suitable for a reactive supply chain serving innovative products for the European market?",
+      opts: ["Southeast Asia, due to low labor costs","Inland China, due to mass manufacturing capacity","Eastern Europe or North Africa, due to speed and proximity","Australia, due to advanced infrastructure"],
+      ans: 2
+    },
+    {
+      q: "Which of the following is a disadvantage of a Level Production Plan?",
+      opts: ["Higher risk of stockout during peak demand periods","Lower plant utilization leading to higher unit production costs","High holding costs due to inventory accumulation during low-demand periods","Higher hiring and firing costs compared to a Chase Demand plan"],
+      ans: 2
+    },
+    {
+      q: "Which of the following is an advantage of a Chase Demand Production Plan?",
+      opts: ["Stable employment pattern and minimized stockout costs","Low holding costs and no risk of product obsolescence","High plant saturation and low unit production costs","Minimized overtime costs and predictable production volumes"],
+      ans: 1
+    },
+    {
+      q: "The Master Production Schedule (MPS) differs from the Production Plan in that it:",
+      opts: ["Covers a longer time horizon and refers to product families","Is drawn up by the Procurement Department rather than Operations","Covers a shorter time horizon and refers to specific SKUs rather than product families","Is only used in Make-to-Order production environments"],
+      ans: 2
+    },
+    {
+      q: "A Stock Keeping Unit (SKU) is defined as:",
+      opts: ["The total quantity of a product family produced in a given period","A unique combination of product characteristics such as size, color, or style","The minimum order quantity required by a supplier","The safety stock level maintained for a specific product"],
+      ans: 1
+    },
+    {
+      q: "In an Assemble-to-Order (ATO) production strategy, which activities are carried out on a PUSH (forecast-driven) basis?",
+      opts: ["Final assembly and delivery only","All activities from engineering to final assembly","Engineering, purchasing, and production of components and sub-assemblies","Only the engineering activity"],
+      ans: 2
+    },
+    {
+      q: "Which production strategy holds NO stock of any material and carries out ALL activities on a pull (order-driven) basis?",
+      opts: ["Make to Stock (MTS)","Make to Order (MTO)","Assemble to Order (ATO)","Engineer to Order (ETO)"],
+      ans: 3
+    },
+    {
+      q: "In a Make-to-Order (MTO) environment, which stock does the company hold?",
+      opts: ["Finished products","Components and sub-assemblies","Bought-out (raw) materials","No stock at all"],
+      ans: 2
+    },
+    {
+      q: "According to Little's Law in Lean Management, Manufacturing Lead Time equals:",
+      opts: ["Batch size divided by cycle time","Average WIP multiplied by Unit Standard Cycle Time","Total production volume divided by available capacity","Setup time plus processing time per unit"],
+      ans: 1
+    },
+    {
+      q: "Which of the following is the primary purpose of the SMED (Single Minute Exchange of Die) technique?",
+      opts: ["To increase batch sizes and improve production efficiency","To reduce setup times and enable smaller batch sizes","To redesign the factory layout in a U-shape configuration","To delegate quality control to direct workers"],
+      ans: 1
+    },
+    {
+      q: "In Lean Management, which type of activity is classified as 'Business Not Value Added' (BNVA)?",
+      opts: ["Transformation of raw materials into finished products","Waiting time between production operations","Preparing financial statements for regulatory compliance","Transportation of materials between workstations"],
+      ans: 2
+    },
+    {
+      q: "Overall Equipment Effectiveness (OEE) is calculated as:",
+      opts: ["Availability × Quality Rate × Speed Rate","Utilization × Efficiency × Conformance Rate","Uptime × Throughput × Defect Rate","Capacity Utilization × Cycle Time × Scrap Rate"],
+      ans: 1
+    },
+    {
+      q: "Which of the following correctly describes Deming's PDCA cycle used in Lean Continuous Improvement?",
+      opts: ["Plan → Do → Check → Act","Prepare → Design → Control → Assess","Plan → Deploy → Control → Adjust","Process → Design → Check → Apply"],
+      ans: 0
+    },
+    {
+      q: "In the Procurement Management process, which step involves the supplier formally specifying the level of quality, quantity, price, and delivery time they can offer?",
+      opts: ["Supplier scouting and qualification","Procurement planning","RFQ/Quotation","Sourcing and approval"],
+      ans: 2
+    },
+    {
+      q: "Which of the following best explains why procurement centralization is more suitable for indirect materials than for direct materials?",
+      opts: ["Indirect materials are more expensive and require tighter cost control","Indirect materials have lower specification requirements, so all factories can use the same supplier","Direct materials are standardized and easily sourced from any supplier globally","Centralization increases supply risk, which is acceptable only for indirect materials"],
+      ans: 1
+    },
+    {
+      q: "In the Kraljic Matrix, bottleneck items are characterized by:",
+      opts: ["High profit impact and low supply risk","Low profit impact and low supply risk","High profit impact and high supply risk","Low profit impact and high supply risk"],
+      ans: 3
+    },
+    {
+      q: "Which sourcing strategy is most appropriate for strategic items in the Kraljic Matrix?",
+      opts: ["Multiple sourcing to maximize competition among suppliers","Single sourcing with partnership, co-development, and investment sharing","Second sourcing to reduce supply risk while maintaining price pressure","Parallel sourcing to achieve customization per product model"],
+      ans: 1
+    },
+    {
+      q: "A company needs 200 conformant pieces. Supplier A: €2.00/unit, 0% scrap rate. Supplier B: €1.80/unit, 10% scrap rate. What is the total cost from each supplier?",
+      opts: ["Supplier A: €400; Supplier B: €360 → Supplier B is cheaper","Supplier A: €400; Supplier B: €400 → They cost the same","Supplier A: €400; Supplier B: €392 → Supplier B is still cheaper","Supplier A: €400; Supplier B: €420 → Supplier A is cheaper"],
+      ans: 2
+    },
+    {
+      q: "Which of the following describes 'parallel sourcing'?",
+      opts: ["Purchasing all materials from a single supplier to maximize volume discounts","Assigning a single dedicated supplier to each product model within a multi-product company","Distributing purchases equally across all available suppliers","Using a primary and a secondary supplier for the same material"],
+      ans: 1
+    },
+    {
+      q: "The 'rolling plan' in procurement is a tool used to:",
+      opts: ["Calculate the optimal reorder point based on lead time and demand variability","Continuously update and communicate minimum/maximum purchase volumes to suppliers over a planning horizon","Rank suppliers using a weighted average of quality, price, and delivery performance","Allocate supply quotas across multiple suppliers based on their Global Vendor Rating"],
+      ans: 1
+    },
+    {
+      q: "Which of the following correctly identifies a key difference between 'sole sourcing' and 'single sourcing'?",
+      opts: ["Sole sourcing is a deliberate strategic choice; single sourcing occurs due to market monopoly","Sole sourcing occurs due to market monopoly; single sourcing is a deliberate strategic choice despite available alternatives","Both are equivalent terms referring to purchasing from one supplier","Single sourcing always involves a long-term partnership contract; sole sourcing does not"],
+      ans: 1
+    },
+    {
+      q: "In Value Stream Mapping, which activity type is one for which the client is NOT willing to pay but which is necessary for legal or regulatory purposes?",
+      opts: ["Value Added (VA)","Not Value Added (NVA)","Business Not Value Added (BNVA)","Waste (W)"],
+      ans: 2
+    },
+    {
+      q: "The 'spaghetti chart' in Lean Management is used to:",
+      opts: ["Visualize the sequence of production orders in a scheduling queue","Map the chaotic physical flow of materials in a poorly designed factory layout","Identify bottlenecks by comparing cycle times across workstations","Calculate the WIP levels at each stage of the production process"],
+      ans: 1
+    },
+    {
+      q: "Which of the following is a benefit of adopting a U-Shape layout in a Lean production system?",
+      opts: ["It maximizes the distance between workstations to reduce interference","It enables workers to see each other's work, increases flexibility, and reduces space requirements","It eliminates the need for quality control by separating incoming and outgoing flows","It allows batch sizes to be increased, reducing total setup time"],
+      ans: 1
+    },
+    {
+      q: "A company applies the Lean principle of 'Pull.' What does this mean in practice?",
+      opts: ["Each production phase operates at maximum speed regardless of downstream demand","Production is triggered by sales forecasts generated by the planning department","Each phase of the process is activated only when the downstream customer places an order","Products are pushed through the supply chain to build up finished goods inventory"],
+      ans: 2
+    },
+    {
+      q: "A company assigns GVR weights: Quality 50%, Delivery 30%, Price 20%. Supplier A scores 3, 1, 2. Supplier B scores 1, 3, 3. What are the GVR scores and which supplier is selected?",
+      opts: ["GVR_A = 2.20; GVR_B = 1.90 → Supplier A selected","GVR_A = 2.20; GVR_B = 2.10 → Supplier A selected","GVR_A = 1.90; GVR_B = 2.20 → Supplier B selected","GVR_A = 2.50; GVR_B = 2.00 → Supplier A selected"],
+      ans: 1
+    },
+    {
+      q: "Which of the following correctly describes the impact of procurement performance on a company's Net Working Capital (NWC)?",
+      opts: ["Higher stock levels reduce NWC because inventory is a liquid asset","Higher stock levels increase NWC, which is a negative financial effect for the company","Procurement has no direct effect on NWC since it only affects the income statement","Lower stock levels increase NWC because they reduce the risk of stockouts"],
+      ans: 1
+    },
+    {
+      q: "In the production planning hierarchy, Material Requirements Planning (MRP) operates at which level and with what main input?",
+      opts: ["Long-term level; input is the annual Demand Plan","Short-term level; input is the Master Production Schedule and the Bill of Materials","Medium-term level; input is the Production Plan and available capacity","Short-term level; input is the sales forecast and safety stock targets"],
+      ans: 1
+    },
+    {
+      q: "Which industry characteristic makes the chase demand plan preferable for the apparel industry despite its disadvantages?",
+      opts: ["High plant saturation requirements and low unit production costs","Stable demand that makes inventory accumulation feasible","The importance of flexibility and responsiveness over efficiency given volatile, seasonal demand","Long product life cycles that allow production to be planned well in advance"],
+      ans: 2
+    },
+    {
+      q: "The Kanban system is associated with which Lean principle, and what is its primary function?",
+      opts: ["Value Stream Mapping; it identifies non-value-added activities in the production flow","Pull; it signals upstream operations that a specific quantity of material is required","Flow; it ensures continuous movement of products without interruption","5S; it organizes and standardizes workstation materials and tools"],
+      ans: 1
+    },
+    {
+      q: "Which of the following statements about the 5S methodology is FALSE?",
+      opts: ["'Sorting' means identifying and keeping only the items needed to perform a task","'Sustain' means applying the 5S procedures continuously over time","'Shine' refers to reorganizing the layout of the factory floor to eliminate waste","'Standardization' means keeping and repeating the previous 5S procedures"],
+      ans: 2
+    }
+  ],
+  2: [
+    {
+      q: "Which of the following best describes the Order Decoupling Point (ODP)?",
+      opts: ["The point where inventory is at its minimum level","The point that separates the push-driven part of the supply chain from the pull-driven part","The moment when a reorder is placed","The point where safety stock is calculated"],
+      ans: 1
+    },
+    {
+      q: "A company producing functional products with predictable demand should adopt:",
+      opts: ["A responsive supply chain with buffer inventory","A reactive supply chain with fast transportation","An efficient supply chain focused on cost reduction","A make-to-order strategy"],
+      ans: 2
+    },
+    {
+      q: "Moving the Order Decoupling Point downstream (closer to the customer):",
+      opts: ["Increases efficiency but reduces responsiveness","Reduces both costs and responsiveness","Increases responsiveness but can lead to higher costs","Has no effect on supply chain costs"],
+      ans: 2
+    },
+    {
+      q: "Which of the following is NOT a driver of supply chain performance?",
+      opts: ["Facilities","Inventory","Marketing budget","Transportation"],
+      ans: 2
+    },
+    {
+      q: "The Economic Order Quantity (EOQ) minimizes:",
+      opts: ["Total material costs and holding costs","Ordering costs and stockout costs","Ordering costs and holding costs","Material costs and ordering costs"],
+      ans: 2
+    },
+    {
+      q: "A company uses a fixed reorder interval and orders up to a predetermined level each time. This is an example of:",
+      opts: ["Continuous review system","Economic order quantity model","Periodic review system","News-vendor model"],
+      ans: 2
+    },
+    {
+      q: "Which of the following statements about safety stock is TRUE?",
+      opts: ["Safety stock is needed only when demand is deterministic","Increasing safety stock always improves profitability","Safety stock is carried to satisfy demand that exceeds the amount forecasted","Safety stock eliminates the possibility of a stockout"],
+      ans: 2
+    },
+    {
+      q: "The bullwhip effect is primarily caused by:",
+      opts: ["Excess safety stock at the retail level","Fluctuations in orders that increase as they move up the supply chain","A sudden decrease in consumer demand","Inefficient transportation routes"],
+      ans: 1
+    },
+    {
+      q: "In a chase production plan:",
+      opts: ["Production is held constant and inventory absorbs demand variation","Both production and inventory levels vary","Production changes in each period to match the sales forecast","Subcontracting is never used"],
+      ans: 2
+    },
+    {
+      q: "Which condition is NOT an assumption of the basic EOQ model?",
+      opts: ["Demand is known and constant","Lead time is known and constant","Quantity discounts are available","The only variable costs are ordering and holding costs"],
+      ans: 2
+    },
+    {
+      q: "A core competence, according to the insourcing/outsourcing framework, should:",
+      opts: ["Be outsourced to reduce costs","Create unique and significant value to the final customer","Be performed only if no suitable supplier exists","Be evaluated using transactional cost analysis"],
+      ans: 1
+    },
+    {
+      q: "In the news-vendor model, the optimal service level (critical ratio) is calculated as:",
+      opts: ["Cost of overstocking / (Cost of overstocking + Cost of understocking)","Cost of understocking / (Cost of overstocking + Cost of understocking)","Cost of understocking / Cost of overstocking","Average demand / Standard deviation of demand"],
+      ans: 1
+    },
+    {
+      q: "Which supply chain strategy is most appropriate for a product with highly uncertain demand?",
+      opts: ["Efficient supply chain with low inventory","Make-to-stock with slow transportation","Responsive supply chain with buffer inventory","Level production plan with no subcontracting"],
+      ans: 2
+    },
+    {
+      q: "The northwest-corner rule in the transportation problem is used to:",
+      opts: ["Minimize total shipping costs directly","Generate an initial feasible solution","Identify the optimal allocation of goods","Calculate the center of gravity of a distribution network"],
+      ans: 1
+    },
+    {
+      q: "Which of the following is a limitation of the center-of-gravity method for facility location?",
+      opts: ["It considers too many cost factors","It cannot be used for distribution centers","It does not take into account true road distances or infrastructure","It requires data on customer lead times"],
+      ans: 2
+    },
+    {
+      q: "A company has annual demand D = 4,000 units, ordering cost S = €50, unit price C = €10, and holding cost rate h = 20%. What is the EOQ?",
+      opts: ["200 units","283 units","316 units","400 units"],
+      ans: 1
+    },
+    {
+      q: "In exponential smoothing, a smoothing constant α close to 1 means:",
+      opts: ["The forecast is very stable and reacts slowly to new data","The forecast gives almost all weight to the most recent observation","The forecast ignores past demand entirely","The forecast is equivalent to a simple moving average"],
+      ans: 1
+    },
+    {
+      q: "Which of the following correctly describes the difference between a periodic and a continuous review system?",
+      opts: ["In a periodic system, order quantity is fixed; in a continuous system, the reorder interval is fixed","In a periodic system, the reorder interval is fixed; in a continuous system, inventory is monitored constantly and a fixed quantity is ordered when ROP is reached","Both systems monitor inventory continuously but differ in order quantity","A continuous system is only used for deterministic demand"],
+      ans: 1
+    },
+    {
+      q: "In aggregate production planning, which cost is associated with reducing the workforce?",
+      opts: ["Overtime cost","Subcontracting cost","Hiring cost","Firing/layoff cost"],
+      ans: 3
+    },
+    {
+      q: "Which of the following best explains why aggregated forecasts tend to be more accurate than individual product forecasts?",
+      opts: ["Aggregated forecasts use more complex mathematical models","Random variations across individual products tend to cancel each other out","Aggregated forecasts always rely on qualitative judgment","Individual product forecasts do not account for seasonality"],
+      ans: 1
+    },
+    {
+      q: "A company evaluates two suppliers. Supplier A: unit price €20, EOQ = 274 units. Supplier B: €18 if orders exceed 1,000 units, EOQ at €18 = 289 units. What should the company do?",
+      opts: ["Order 289 units from Supplier B","Order 274 units from Supplier A","Order 1,000 units from Supplier B and compare total costs","Order 500 units from either supplier"],
+      ans: 2
+    },
+    {
+      q: "In the Kraljic matrix, a product that has HIGH importance of purchase and LOW complexity of purchase situation is classified as:",
+      opts: ["Strategic item","Bottleneck item","Non-critical item","Leverage item"],
+      ans: 3
+    },
+    {
+      q: "Which of the following is true about the Make-to-Order (MTO) strategy?",
+      opts: ["Products require no customisation and are produced for stock","Products are customised only at the very end of the manufacturing process","Products use standard components but have customer-specific final configuration","Products are designed from scratch based on unusual customer requirements"],
+      ans: 2
+    },
+    {
+      q: "If a forecast consistently produces positive errors (Actual > Forecast), this indicates:",
+      opts: ["The model is overestimating demand and should be corrected upward","The model is underestimating demand and should be corrected upward","The random component of demand is being well captured","The smoothing constant is too high"],
+      ans: 1
+    },
+    {
+      q: "In the savings heuristic for the Vehicle Routing Problem, a 'saving' Δij is calculated as:",
+      opts: ["The sum of distances from the warehouse to customer i and customer j","The reduction in cost achieved by serving customers i and j in a single route instead of two separate routes","The average distance between all customers in a route","The fixed cost of adding one more vehicle to the fleet"],
+      ans: 1
+    },
+    {
+      q: "Which of the following correctly describes the 'lag strategy' for capacity expansion?",
+      opts: ["Capacity is added in anticipation of demand to avoid stockouts","Capacity is adapted to demand precisely when it is needed","Capacity is added only after demand has already materialised","Capacity is kept constant regardless of demand fluctuations"],
+      ans: 2
+    },
+    {
+      q: "A product has mean demand of 500 units and standard deviation of 50 units. The company wants a 99% service level (z = 2.33). What is the optimal replenishment quantity in a news-vendor setting?",
+      opts: ["500 units","550 units","565 units","616.5 units"],
+      ans: 3
+    },
+    {
+      q: "In Supply Chain Design decisions, which of the following is NOT typically considered a long-term strategic decision?",
+      opts: ["Location and capacity of facilities","Outsourcing of non-core supply chain functions","Allocating a specific customer order to a warehouse","Which transportation mode to use across the network"],
+      ans: 2
+    },
+    {
+      q: "Which of the following actions would most effectively reduce the bullwhip effect caused by order batching?",
+      opts: ["Increasing safety stock at each stage","Adopting EDI or internet-based ordering to reduce fixed ordering costs","Moving the Order Decoupling Point upstream","Switching from a chase to a level production plan"],
+      ans: 1
+    },
+    {
+      q: "The MAPE (Mean Absolute Percentage Error) differs from MAD because:",
+      opts: ["MAPE squares the forecast errors while MAD does not","MAPE expresses forecast error as a percentage of actual demand, making it scale-independent","MAPE is only used for seasonal time series","MAPE cannot be used to compare two different forecasting models"],
+      ans: 1
+    },
+    {
+      q: "A company applies the seasonal index adjustment. The unadjusted forecast for July is 400 units and the seasonal index for July is 1.25. What is the seasonally adjusted forecast?",
+      opts: ["320 units","400 units","500 units","525 units"],
+      ans: 2
+    },
+    {
+      q: "In the transportation problem, an optimal solution has been reached when:",
+      opts: ["All supply and demand constraints are satisfied","All improvement indices for unused cells are greater than or equal to zero","The northwest-corner rule has been fully applied","The number of used cells equals the number of sources"],
+      ans: 1
+    },
+    {
+      q: "Which of the following is a characteristic of a 'strategic item' in the Kraljic matrix?",
+      opts: ["Low importance of purchase and high complexity of purchase situation","High importance of purchase and low complexity of purchase situation","High importance of purchase and high complexity of purchase situation","Low importance of purchase and low complexity of purchase situation"],
+      ans: 2
+    },
+    {
+      q: "A company stores 60% inventory as finished goods and 40% as raw materials. Demand has become highly unpredictable. What would be the most appropriate adjustment?",
+      opts: ["Increase finished goods inventory to improve service levels","Shift more inventory toward raw materials to preserve flexibility","Reduce total inventory to cut holding costs","Move the Order Decoupling Point downstream"],
+      ans: 1
+    },
+    {
+      q: "In the four-step procedure for seasonal adjustment, what does a Demand/Forecast ratio greater than 1 indicate?",
+      opts: ["The model has overforecast demand for that period","The model has underforecast demand for that period","The seasonal index should be set to zero for that period","The trend component dominates the seasonal component"],
+      ans: 1
+    },
+    {
+      q: "Which of the following statements about nearshoring is correct?",
+      opts: ["It involves bringing offshore production back to the home country","It means contracting suppliers outside the geographic boundaries of the home country","It involves relocating sources to countries geographically closer to the home country","It is primarily driven by the desire to reduce product quality standards"],
+      ans: 2
+    },
+    {
+      q: "A level production plan compared to a chase production plan typically results in:",
+      opts: ["Lower holding costs but higher hiring and firing costs","Higher holding costs but lower hiring and firing costs","Lower total costs in all scenarios","Higher subcontracting costs and lower inventory costs"],
+      ans: 1
+    },
+    {
+      q: "Which of the following best describes the concept of 'strategic fit' in supply chain management?",
+      opts: ["Ensuring that all suppliers are located in the same geographic region","Aligning the supply chain strategy with the competitive strategy in terms of responsiveness and efficiency","Maximizing the number of facilities in the supply chain network","Matching the order quantity with the forecasted demand exactly"],
+      ans: 1
+    },
+    {
+      q: "In a continuous review system, if both demand rate and lead time are variable, the reorder point is calculated as:",
+      opts: ["ROP = average demand per day × lead time","ROP = average demand per day × lead time + safety stock","ROP = safety stock only","ROP = EOQ / 2 + safety stock"],
+      ans: 1
+    },
+    {
+      q: "Which of the following is TRUE about the MSE (Mean Squared Error) as a measure of forecast accuracy?",
+      opts: ["MSE penalizes small errors more than large errors","MSE is always expressed as a percentage of actual demand","MSE penalizes large errors more heavily due to the squaring of deviations","MSE and MAD always produce the same ranking of forecasting models"],
+      ans: 2
+    }
+  ]
+};
+
+let currentModule = 1;
+let currentIndex = 0;
+let answered = false;
+let score = 0;
+let skipped = 0;
+let wrong = 0;
+let userAnswers = [];
+
+function startQuiz(module) {
+  currentModule = module;
+  currentIndex = 0;
+  answered = false;
+  score = 0; skipped = 0; wrong = 0;
+  userAnswers = new Array(QUESTIONS[module].length).fill(null);
+
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('results-view').style.display = 'none';
+  const qv = document.getElementById('quiz-view');
+  qv.style.display = 'flex';
+
+  const label = document.getElementById('module-label');
+  const fill = document.getElementById('progress-fill');
+  label.textContent = module === 1 ? 'Module 1' : 'Module 2';
+  label.className = 'quiz-module-label ' + (module === 1 ? 'm1-label' : 'm2-label');
+  fill.className = 'progress-bar-fill ' + (module === 1 ? 'm1-fill' : 'm2-fill');
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'nav-btn ' + (module === 1 ? 'primary-m1' : 'primary-m2');
+
+  document.getElementById('q-total').textContent = QUESTIONS[module].length;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const qs = QUESTIONS[currentModule];
+  const q = qs[currentIndex];
+  answered = false;
+
+  document.getElementById('q-current').textContent = currentIndex + 1;
+  document.getElementById('score-live').textContent = score;
+  const pct = ((currentIndex) / qs.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  document.getElementById('q-num-label').textContent = `Question ${currentIndex + 1} of ${qs.length}`;
+  document.getElementById('q-text').textContent = q.q;
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    div.onclick = () => selectAnswer(i);
+    container.appendChild(div);
+  });
+
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('skip-btn').style.display = 'inline-flex';
+}
+
+function selectAnswer(chosen) {
+  if (answered) return;
+  answered = true;
+
+  const q = QUESTIONS[currentModule][currentIndex];
+  const opts = document.querySelectorAll('.option');
+  opts.forEach(o => o.classList.add('disabled'));
+
+  userAnswers[currentIndex] = chosen;
+  const fb = document.getElementById('feedback');
+  const letters = ['A','B','C','D'];
+
+  if (chosen === q.ans) {
+    opts[chosen].classList.add('selected-correct');
+    fb.className = 'feedback correct-fb';
+    fb.textContent = '✓ Correct!';
+    score++;
+  } else {
+    opts[chosen].classList.add('selected-wrong');
+    opts[q.ans].classList.add('show-correct');
+    fb.className = 'feedback wrong-fb';
+    fb.textContent = `✗ Wrong. The correct answer was ${letters[q.ans]}: ${q.opts[q.ans]}`;
+    wrong++;
+  }
+
+  document.getElementById('score-live').textContent = score;
+  document.getElementById('skip-btn').style.display = 'none';
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.style.display = 'inline-flex';
+  const isLast = currentIndex === QUESTIONS[currentModule].length - 1;
+  nextBtn.textContent = isLast ? 'See Results →' : 'Next Question →';
+}
+
+function skipQuestion() {
+  if (answered) return;
+  userAnswers[currentIndex] = -1;
+  skipped++;
+  const isLast = currentIndex === QUESTIONS[currentModule].length - 1;
+  if (isLast) showResults();
+  else { currentIndex++; renderQuestion(); }
+}
+
+function nextQuestion() {
+  const isLast = currentIndex === QUESTIONS[currentModule].length - 1;
+  if (isLast) showResults();
+  else { currentIndex++; renderQuestion(); }
+}
+
+function showResults() {
+  document.getElementById('quiz-view').style.display = 'none';
+  const rv = document.getElementById('results-view');
+  rv.style.display = 'flex';
+  rv.style.flexDirection = 'column';
+
+  const total = QUESTIONS[currentModule].length;
+  const pct = Math.round((score / total) * 100);
+
+  document.getElementById('results-module-label').textContent = currentModule === 1 ? 'Module 1 · Results' : 'Module 2 · Results';
+  const scoreEl = document.getElementById('results-score-big');
+  scoreEl.textContent = pct + '%';
+  scoreEl.style.color = pct >= 60 ? 'var(--correct)' : 'var(--wrong)';
+  document.getElementById('results-total-text').textContent = `${score} correct out of ${total} questions`;
+  document.getElementById('rb-correct').textContent = score;
+  document.getElementById('rb-wrong').textContent = wrong;
+  document.getElementById('rb-skipped').textContent = skipped;
+
+  const retryBtn = document.getElementById('retry-btn');
+  retryBtn.textContent = 'Retry Module ' + currentModule;
+  retryBtn.className = 'nav-btn ' + (currentModule === 1 ? 'primary-m1' : 'primary-m2');
+
+  // Review list
+  const rl = document.getElementById('review-list');
+  rl.innerHTML = '';
+  const qs = QUESTIONS[currentModule];
+  const wrongOnes = qs.filter((q, i) => userAnswers[i] !== q.ans);
+  if (wrongOnes.length > 0) {
+    const heading = document.createElement('div');
+    heading.style.cssText = 'font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;';
+    heading.textContent = 'Review · Incorrect Answers';
+    rl.appendChild(heading);
+
+    const letters = ['A','B','C','D'];
+    qs.forEach((q, i) => {
+      if (userAnswers[i] === q.ans) return;
+      const div = document.createElement('div');
+      div.className = 'review-item ' + (userAnswers[i] === -1 ? 'r-wrong' : 'r-wrong');
+      const yourAns = userAnswers[i] === -1 ? 'Skipped' : `${letters[userAnswers[i]]}: ${q.opts[userAnswers[i]]}`;
+      div.innerHTML = `<div class="review-q">Q${i+1}. ${q.q}</div>
+        <div class="review-your">Your answer: ${yourAns}</div>
+        <div class="review-correct-ans">✓ Correct: ${letters[q.ans]}: ${q.opts[q.ans]}</div>`;
+      rl.appendChild(div);
+    });
+  }
+}
+
+function retryQuiz() {
+  startQuiz(currentModule);
+}
+
+function goHome() {
+  document.getElementById('quiz-view').style.display = 'none';
+  document.getElementById('results-view').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+}
+</script>
+</body>
+</html>
